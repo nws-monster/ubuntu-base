@@ -25,4 +25,4 @@ jobs:
           context: .
           file: ./Dockerfile.focal
           push: true
-          tags: ghcr.io/nws-monster/ubuntu:latest,ghcr.io/nws-monster/ubuntu:focal,ghcr.io/nws-monster/ubuntu:focal-$GITHUB_SHA
+          tags: ghcr.io/nws-monster/ubuntu:latest,ghcr.io/nws-monster/ubuntu:focal,ghcr.io/nws-monster/ubuntu:focal-${{ github.sha }}
