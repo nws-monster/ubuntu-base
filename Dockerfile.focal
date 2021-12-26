@@ -1,0 +1,38 @@
+FROM ubuntu:focal as builder
+
+ARG ubuntu_uid=1000
+ARG ubuntu_gid=1000
+ARG ubuntu_user="ubuntu"
+ARG description="An ubuntu:focal base image for use in nws.monster projects."
+ARG packages_list=packages.list
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=America/Chicago \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_CTYPE="C" \
+    LC_ALL=en_US.UTF-8
+
+LABEL nws.monster.stack.id=focal
+LABEL nws.monster.stack.user=${ubuntu_user}
+LABEL nws.monster.stack.user.uid=${ubuntu_uid}
+LABEL nws.monster.stack.user.gid=${ubuntu_gid}
+LABEL nws.monster.stack.description=${description}
+LABEL nws.monster.stack.tz=${TZ}
+LABEL nws.monster.stack.lang=${LANG}
+
+RUN groupadd ${ubuntu_user} --gid ${ubuntu_gid} \
+    && useradd --uid ${ubuntu_uid} --gid ${ubuntu_gid} -m -s /bin/bash ${ubuntu_user}
+
+COPY ${packages_list} /tmp/packages.list
+
+RUN apt-get update && apt-get install -y \
+    $(grep -vE "^\s*#" /tmp/packages.list | tr "\n" " ") \
+    && sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
+    && dpkg-reconfigure -f noninteractive locales \
+    && update-locale LANG=en_US.UTF-8 \
+    && echo $TZ > /etc/timezone \
+    && rm -f /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/packages.list
