@@ -36,3 +36,6 @@ RUN apt-get update && apt-get install -y \
     && dpkg-reconfigure -f noninteractive tzdata \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/packages.list
+
+USER ${ubuntu_uid}:${ubuntu_gid}
+WORKDIR /home/${ubuntu_user}
